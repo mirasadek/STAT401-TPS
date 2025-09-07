@@ -1,0 +1,66 @@
+---
+title: "draft_tp9_stat"
+author: "Mira Sadek"
+date: "2025-04-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r cars}
+data <- read.table("her.txt",header = TRUE, sep = "\t")
+```
+
+exercice 1
+```{r}
+sys<-data$sys
+dia<-data$dia
+diff<-sys-dia
+```
+Les échantillons sont appariés: il s’agit de la pression sanguine du même échantillon d’individus, l’une étant la pression maximale (sys), l’autre la pression minimale (dia).
+
+partie 2
+```{r}
+par(mfrow=c(1,2))
+hist(diff,probability = TRUE)
+curve(dnorm(x,mean(diff),sd(diff)),col="red",add=T)
+qqnorm(diff); 
+abline(mean(diff),sd(diff),col="red")
+```
+La distribution ne semble pas très éloignée de la loi normale. Mais comme n est grand, la moyenne de diff suivra elle bien une loi normale d’après le Théorème central limite (TCL).
+
+partie 3
+```{r}
+alpha=0.05
+moyenne<-mean(diff)
+n<-length(diff)
+t<-qt(1-alpha/2,n-1)
+binf<-moyenne-t*sd(diff)/sqrt(n)
+bsup<-moyenne+t*sd(diff)/sqrt(n)
+```
+
+partie 4
+test: H0: mean(diff)=0,
+H1: mean(diff) différent de zéro.
+```{r}
+tcalc <- (mean(diff)*sqrt(length(diff))/sd(diff))
+cat("tcalc=",tcalc,"\n")
+pvaleur <- 2*(1-pt(abs(tcalc),length(diff)-1))
+cat("pvaleur=",pvaleur,"\n")
+```
+partie 5
+```{r}
+t.test(diff)
+t.test(sys,dia,paired=T)
+```
+
+partie 6
+H0: mean(diff)=40, 
+H1: mean(diff)>40
+```{r}
+t.test(diff,mu=40,alternative="greater")
+```
+La p-valeur est de 7e-5 donc oui, la conclusion est très signicafive.
